@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To Do List</title>
+    <link rel="stylesheet" href="/style/style.css">
+</head>
+<body>
+    <div class="today">
+        <h2>Today</h2>
+        <div class="container">
+        <% item.forEach((val)=>{%>
+        <div class="doing">
+
+            <div class="item">
+            <form action="/delete" method="post">
+                <input type="checkbox" name="userid"  value="<%-val.id%>" onclick="this.form.submit()">
+            </form>
+
+            <div class="P-item">
+                <p class="title-item" id="para<%- val.id %>"><%= val.title %></p>
+                <p id="timepara<%- val.id %>">Time: <%= val.t_start %>—<%= val.t_end %></p>
+            </div>
+
+            <form action="/edit" method="post">
+                <input type="checkbox" name="id" value="<%- val.id %>" hidden checked>
+                <div>
+                <input type="text" name="change" id="change<%- val.id %>" hidden value="<%= val.title %>" class="edit-titile" autofocus  >
+                
+                <p>
+                <label id="labletimeS<%- val.id %>" for="timeS<%- val.id %>" hidden>Start Time</label>
+                <input type="time" name="timeS" id="timeS<%- val.id %>" hidden value="<%= val.t_start %>"></p>
+                <p>
+                <label for="timeE<%- val.id %>" id="labletimeE<%- val.id %>" hidden>End Time</label>
+                <input type="time" name="timeE" id="timeE<%- val.id %>" hidden value="<%= val.t_end %>" ></p></div>
+                <div>
+                <button type="submit" hidden id="todaysubmit<%- val.id %>" class="check"><img src="/icon/check-solid.png" alt="" height="20px"></button></div>
+            </form>
+            <button onclick="update('<%-val.id%>')" class="pencil" id="click<%- val.id %>"><img src="/icon/pencil-solid.png" alt="" height="20px"></button>
+        </div>
+        <hr>
+        </div>
+        <% })  %>
+    <div class="add-item">
+        <form action="/add" method="post">
+            <input type="text" name="new" placeholder="input new item" autofocus>
+            <br>
+                <label for="timeS">Start Time</label>
+            <input type="time" name="timeS" id="time" >
+       
+        <br>
+                <label for="time">End Time</label>
+            <input type="time" name="timeE" id="timeE">
+        
+            <button type="submit" class="add-icon">+</button>
+        </form>
+    </div>
+    </div>
+    </div>
+<p class="date"><%=new Date().getDate() %>/<%=new Date().getMonth() %>/<%=new Date().getFullYear() %></p>
+
+    <script>
+        function update(id){
+            console.log(id)
+            document.getElementById("para"+id).setAttribute("hidden",true);
+            document.getElementById("click"+id).setAttribute("hidden",true);
+            document.getElementById("timepara"+id).setAttribute("hidden",true);
+            document.getElementById("change"+id).removeAttribute("hidden");
+            document.getElementById("timeS"+id).removeAttribute("hidden");
+            document.getElementById("timeE"+id).removeAttribute("hidden");
+            document.getElementById("todaysubmit"+id).removeAttribute("hidden");
+            document.getElementById("labletimeS"+id).removeAttribute("hidden");
+            document.getElementById("labletimeE"+id).removeAttribute("hidden");
+        }
+    </script>
+</body>
+</html>
