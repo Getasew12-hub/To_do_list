@@ -1,5 +1,8 @@
+import e from "express";
 import express from "express";
 import pg from "pg";
+import env from "dotenv";
+env.config();
 
 const app=express();
 app.use(express.urlencoded({extended:true}));
@@ -10,11 +13,7 @@ let week=[];
 let month=[];
 
 const db=new pg.Client({
-    user:"postgres",
-    password:"geach3212",
-    database:"persistance",
-    host:"localhost",
-    port:5432,
+    connectionString:process.env.DATABASE_URL
   })
   db.connect();
 
@@ -47,10 +46,21 @@ app.post("/add",async(req,res)=>{
     const news=req.body.new;
 
     try{
-     await db.query("INSERT INTO today (title,t_start,t_end) VALUES($1,$2,$3)",[news,t_start,t_end])
+        if(!news) throw new Error("Task cannot be empty");
+        if(t_start && !t_end){
+  await db.query("INSERT INTO today (title,t_start) VALUES($1,$2)",[news,t_start])
+        }else if(!t_start && t_end){
+  await db.query("INSERT INTO today (title,t_end) VALUES($1,$2)",[news,t_end])
+        }else if(t_start && t_end){
+  await db.query("INSERT INTO today (title,t_start,t_end) VALUES($1,$2,$3)",[news,t_start,t_end])
+        }else{
+  await db.query("INSERT INTO today (title) VALUES($1)",[news])
+        }
+   
      res.redirect("/")
     }catch(err){
-        console.log(err);
+        console.log("error on adding new task",err.message);
+        res.redirect("/");
     }
 
 })
@@ -62,7 +72,18 @@ app.post("/edit",async(req,res)=>{
    const id=req.body.id;
 
    try{
-       await db.query("UPDATE today SET title=$1, t_start=$2,t_end=$3 WHERE id=$4;",[title,times,timeE,id]);
+    if(!title) throw new Error("Task cannot be empty");
+     if(!times && timeE){
+        await db.query("UPDATE today SET title=$1, t_end=$2 WHERE id=$3;",[title,timeE,id]);
+      
+     }else if(times && !timeE){
+        await db.query("UPDATE today SET title=$1, t_start=$2 WHERE id=$3;",[title,times,id]);
+     }else if(!times && !timeE){
+        await db.query("UPDATE today SET title=$1 WHERE id=$2;",[title,id]);
+     }else{
+        await db.query("UPDATE today SET title=$1, t_start=$2, t_end=$3 WHERE id=$4;",[title,times,timeE,id]);
+     }
+       
        res.redirect("/");
    }catch(err){
     console.log(err);
