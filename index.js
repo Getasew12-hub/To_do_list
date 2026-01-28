@@ -2,18 +2,30 @@ import e from "express";
 import express from "express";
 import pg from "pg";
 import env from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 env.config();
 
 const app=express();
 app.use(express.urlencoded({extended:true}));
 app.use(express.static("public"));
+
+
+app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "ejs");
+
 const port=3000;
 let today=[];
 let week=[];
 let month=[];
 
 const db=new pg.Client({
-    connectionString:process.env.DATABASE_URL
+    connectionString:process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
   })
   db.connect();
 
