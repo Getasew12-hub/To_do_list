@@ -101,6 +101,10 @@ app.post("/edit",async(req,res)=>{
     console.log(err);
    }
 })
-app.listen(port,()=>{
-    console.log(`your server is running on port ${port}`)
-})
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(port, () => {
+    console.log(`Local server running on http://localhost:${port}`);
+  });
+}
+
+export default app; // This is the most important line for Vercel!
